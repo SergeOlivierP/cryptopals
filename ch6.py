@@ -2,6 +2,7 @@ import string
 import binascii
 import base64
 import re
+import numpy as np
 from operator import itemgetter
 
 
@@ -10,7 +11,11 @@ def hammingDist(text1,text2):
 
 
 def getNorm(k,ciph):
-    return hammingDist(ciph[:k],ciph[k:2*k])/k
+    d1 = hammingDist(ciph[:k],ciph[k:2*k])
+    d2 = hammingDist(ciph[2*k:3*k],ciph[3*k:4*k])
+    d3 = hammingDist(ciph[4*k:5*k],ciph[5*k:6*k])
+    d4 = hammingDist(ciph[6*k:7*k],ciph[7*k:8*k])
+    return (d1+d2+d3+d4)/(4*k)
 
 
 def splitCipher(keySize, cipher):
@@ -19,16 +24,9 @@ def splitCipher(keySize, cipher):
     return splitted
 
 
-def xorSingleChar(bytelist,char):
-
-    printable = []
-
-    for byte in bytelist:
-        sym=chr(ord(byte)^ord(char))
-        if re.match(r"[a-zA-Z]|[ ]", sym):
-            printable.append(sym)
-    result = str("".join([y for y in printable]))
-    return result
+def xorSingleChar(bytestr,char):
+    xor = lambda k: chr(ord(k)^ord(char))
+    return str("".join([xor(b) for b in bytestr if re.match(r"[a-zA-Z]|[ ]", xor(b))]))
 
 
 def getScore(s):
@@ -49,36 +47,37 @@ def getScore(s):
     return score
 
 
-def findSingleKey(cipher):
-    toute = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:,. !?"
-    plain = [getScore(xorSingleChar(cipher,char)) for char in toute]
-    key = toute[plain.index(max(plain))]
-    return(key,max(plain))
+def findCeasarKey(cipher):
+    printable = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:,. !?"
+    plain = [getScore(xorSingleChar(cipher,char)) for char in printable]
+    return printable[np.argmax(plain)]
 
 
-def findKeySizes(cipher):
+def findKeySizes(cipher, n):
     tab = []
     for i in range(2,40):
         tab.append((i,getNorm(i,cipher)))
     tab.sort(key=lambda tup: tup[1])
-    keyS = tab[0][0]
-    return (tab[0][0],tab[1][0],tab[2][0],tab[3][0],tab[4][0])
+    return tab[n][0]
 
+def findKey(cipherText, KeySize):
+    blocks = splitCipher(k, cipherTxt)
+    splitted = [[chr(j) for j in i] for i in blocks]
+    return "".join(findCeasarKey(splitted[l]) for l in range(0,k))
+
+def deCipher(cipher,key):
+    buf = str("".join([key for y in range(len(cipher))]))[:len(cipher)]
+    result = "".join([chr(cipher[i]^ord(buf[i])) for i in range(0,len(cipher))]) 
+    return(result)
 
 if __name__ == "__main__":
     
     cipherTxt = base64.b64decode(open('cipherfile2', 'r').read()) 
     
-    probableSizes = findKeySizes(cipherTxt)
+    for guess in range(0,5):
+        k = findKeySizes(cipherTxt,guess)
+        print('Key size:', k)
+        print(findKey(cipherTxt, k), "\n")
 
-
-    for k in probableSizes:
-        print('**************************')
-        print("Trying size: ", k)
-        y = splitCipher(k, cipherTxt)
-        splitted = [[chr(j) for j in i] for i in y]
-        for l in range(0, k):
-            print('probable key char for char', l)
-            print(findSingleKey(splitted[l]))
-
-        
+    key = 'Terminator X: Bring the noise'
+    print(deCipher(cipherTxt, key))
