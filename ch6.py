@@ -79,5 +79,3 @@ if __name__ == "__main__":
         print('Key size:', k)
         print(findKey(cipherTxt, k), "\n")
 
-    key = 'Terminator X: Bring the noise'
-    print(deCipher(cipherTxt, key))
