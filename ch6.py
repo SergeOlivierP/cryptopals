@@ -25,11 +25,13 @@ def splitCipher(keySize, cipher):
 
 
 def xorSingleChar(bytestr,char):
-    xor = lambda k: chr(ord(k)^ord(char))
-    return str("".join([xor(b) for b in bytestr if re.match(r"[a-zA-Z]|[ ]", xor(b))]))
+    xor = lambda k: ord(k)^ord(char)
+    return b''.join([xor(b) for b in bytestr])
 
 
-def getScore(s):
+def getScore(b):
+
+    s = str("".join([chr(j) for j in bytestr if re.match(r"[a-zA-Z]|[ ]",chr(j))]))
 
     freqs = {
     'a': 0.0651738, 'b': 0.0124248, 'c': 0.0217339, 'd': 0.0349835, 'e': 0.1041442,
