@@ -34,5 +34,6 @@ def ecbORcbc(cipher):
 if __name__ == "__main__":
 
     for i in range(10):
-        plain = bytes(64)
+        #plain = bytes(64)
+        plain = bytes(open('plain.txt', 'r').read(), 'utf-8')
         print(ecbORcbc(encryptionOracle(plain)), "\n")
