@@ -4,8 +4,8 @@ import re
 
 # Operation of strings
 
-def xor(bytestr1, bytestr2):
-    return [ bytestr1[i]^bytestr2[i] for i in range(len(bytestr1)) ]
+def xor16(bytestrA, bytestrB):
+    return b''.join([bytes([bytestrA[i]^bytestrB[i]]) for i in range(16)])
 
 
 def xorSingleChar(bytestr,char):
@@ -38,13 +38,13 @@ def decodeHexLines(filename):
         s = binascii.unhexlify(line)
         yield s
 
-def decB64file(filename)
+def decB64file(filename):
     return base64.b64decode(open(filename, 'r').read())
 
 # Detection of certain patterns
 
 def detectECBEncryption(line):
-    blocks = splitAES(line)
+    blocks = splitTxt(line,16)
     return any(blocks.count(x) > 1 for x in blocks)
 
 
