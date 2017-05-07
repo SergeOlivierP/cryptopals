@@ -1,41 +1,61 @@
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-from functools import reduce
-from util import xor16, padPKCS7, splitTxt
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.strxor import strxor
+import util
+
+class cbc:
+    def __init__(self, key, IV):
+        self._ECB = AES.new(key, AES.MODE_ECB)
+        self._IV = IV
+        self._blocksize = 16
+
+    def _getBlocks(self, s):
+        return [s[i:i+self._blocksize] for i in range(0, len(s), self._blocksize)]
+
+    def encrypt(self, plaintext):
+        plainblocks = self._getBlocks(plaintext)
+        plainblocks[-1] = util.padPKCS7(plainblocks[-1])
+        ciphertext = b''
+        prev = self._IV
+        for i in range(len(plainblocks)):
+            plainblock = plainblocks[i]
+            cipherblock = self._ECB.encrypt(util.xor16(plainblock, prev))
+            ciphertext += cipherblock
+            prev = cipherblock
+        return ciphertext
+
+    def decrypt(self, ciphertext):
+        cipherblocks = self._getBlocks(ciphertext)
+        plaintext = b''
+        prev = self._IV
+        for i in range(len(cipherblocks)):
+            cipherblock = cipherblocks[i]
+            plainblock = util.xor16(self._ECB.decrypt(cipherblock), prev)
+            plaintext += plainblock
+            prev = cipherblock
+        return plaintext
 
 
-def ecbEncrypt(key, plain):
-    plain = padPKCS7(plain,16)
-    backend = default_backend()
-    cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=backend)
-    encryptor = cipher.encryptor()
-    cipherTxt = encryptor.update(plain)
-    return cipherTxt
+class ecb:
+    def __init__(self, key):
+        self._cipher = AES.new(key, AES.MODE_ECB)
+        self._key = key    
 
-def ecbDecrypt(key, ciphertxt):
-    backend = default_backend()
-    cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=backend)
-    decryptor = cipher.decryptor()
-    return decryptor.update(ciphertxt) + decryptor.finalize()
+    def encrypt(self, text):
+        paddedtext = util.padPKCS7(text)
+        return self._cipher.encrypt(paddedtext)
+
+    def decrypt(self, ciphertext):
+        return self._cipher.decrypt(ciphertext)
 
 
-def cbcEncrypt(key, plain, IV):
-    blocks = splitTxt(plain, 16)
-    blocks[-1] = padPKCS7(blocks[-1],16)
-    x0 =  xor16(blocks[0],IV)
-    cipherTxt = [ecbEncrypt(key, x0)[:16]]
-    for i in range(1, len(blocks)):
-        x = xor16(cipherTxt[i-1], blocks[i])
-        localCipher = ecbEncrypt(key, x)[:16]
-        cipherTxt.append(localCipher)
-    return b''.join(cipherTxt)
 
-def cbcDecrypt(key, ciphertext, IV):
-    blocks = splitTxt(ciphertext, 16)
-    x0 = ecbDecrypt(key, blocks[0])
-    plainList = [xor16(x0,IV)]
-    for i in range(1, len(blocks)):
-        plainList.append(xor16(blocks[i-1],ecbDecrypt(key, blocks[i])))
-    plainList = reduce(lambda x,y: x+y,plainList)
-    return "".join([chr(j) for j in plainList])
+if __name__ == '__main__':
+    x = base64.b64decode(open('cipherfile5', 'r').read())
 
+    key = b'YELLOW SUBMARINE'
+    cipher = CBC(key , bytes([0] * 16))
+    y = cipher.decrypt(x)
+    print(y.decode('utf-8'))
+    z = cipher.encrypt(y)
+    print(z)

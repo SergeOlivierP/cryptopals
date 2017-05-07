@@ -1,9 +1,7 @@
 import aes
-from util import splitTxt
+from util import splitTxt, randBytes
 import random
 
-def randBytes(n):
-    return  b''.join([bytes([random.randint(0, 255)]) for i in range(n)])
 
 def encryptionOracle(text):
     prefixL = random.randint(5,10)
@@ -15,10 +13,12 @@ def encryptionOracle(text):
 
     if mode == 0:
         print("The oracle chose: CBC")
-        return aes.cbcEncrypt(randBytes(16), toEncrypt, randBytes(16))
+        ecbCipher = aes.cbc(randBytes(16), randBytes(16))
+        return ecbCipher.encrypt(toEncrypt)
     else:
         print("The oracle chose: ECB")
-        return aes.ecbEncrypt(randBytes(16), toEncrypt)
+        ecbCipher = aes.ecb(randBytes(16))
+        return ecbCipher.encrypt(toEncrypt)
     
 
 
@@ -26,14 +26,14 @@ def ecbORcbc(cipher):
     blocks = splitTxt(cipher, 16)
     
     if any(blocks.count(x) > 1 for x in blocks):
-        return "ECB detected"
+        return "Detected: ECB"
     else:
-        return "CBC detected or plaintext without pattern"
+        return "Detected: CBC"
     
 
 if __name__ == "__main__":
 
     for i in range(10):
-        #plain = bytes(64)
-        plain = bytes(open('plain.txt', 'r').read(), 'utf-8')
+        plain = bytes(64)
+        #plain = bytes(open('plain.txt', 'r').read(), 'utf-8')
         print(ecbORcbc(encryptionOracle(plain)), "\n")

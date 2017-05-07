@@ -1,6 +1,7 @@
 import binascii
 import base64
 import re
+import random
 
 # Operation of strings
 
@@ -13,8 +14,8 @@ def xorSingleChar(bytestr,char):
     return b''.join([xor(b) for b in bytestr])
 
 
-def padPKCS7(text, keyL):
-    pad = keyL - (len(text) % keyL)
+def padPKCS7(text):
+    pad = 16 - (len(text) % 16)
     return text + bytes([pad] * pad)
 
 
@@ -26,6 +27,9 @@ def xorVigenere(txt,key):
     buf = "".join([key for y in range(len(txt))])[:len(txt)]
     return "".join([hex(ord(txt[i])^ord(buf[i]))[2:] for i in range(0,len(txt))])
 
+
+def randBytes(n):
+    return  b''.join([bytes([random.randint(0, 255)]) for i in range(n)])
 
 
 #Extract and decode specific encoding in files
