@@ -21,6 +21,8 @@ def ecbORcbc(cipher):
     else:
         return "Detected: CBC"
 
+def getBlockSize(text):
+    return size
 
 if __name__ == "__main__":
     key =  randBytes(16)
