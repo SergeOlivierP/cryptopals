@@ -3,14 +3,15 @@ from Crypto.Cipher import AES
 from Crypto.Util.strxor import strxor
 import util
 
+
 class cbc:
     def __init__(self, key, IV):
         self._ECB = AES.new(key, AES.MODE_ECB)
         self._IV = IV
-        self._blocksize = 16
+        self._blksize = 16
 
     def _getBlocks(self, s):
-        return [s[i:i+self._blocksize] for i in range(0, len(s), self._blocksize)]
+        return [s[i:i+self._blksize] for i in range(0, len(s), self._blksize)]
 
     def encrypt(self, plaintext):
         plainblocks = self._getBlocks(plaintext)
@@ -39,7 +40,7 @@ class cbc:
 class ecb:
     def __init__(self, key):
         self._cipher = AES.new(key, AES.MODE_ECB)
-        self._key = key    
+        self._key = key
 
     def encrypt(self, text):
         paddedtext = util.padPKCS7(text)
@@ -49,12 +50,11 @@ class ecb:
         return self._cipher.decrypt(ciphertext)
 
 
-
 if __name__ == '__main__':
     x = base64.b64decode(open('cipherfile5', 'r').read())
 
     key = b'YELLOW SUBMARINE'
-    cipher = CBC(key , bytes([0] * 16))
+    cipher = CBC(key, bytes([0] * 16))
     y = cipher.decrypt(x)
     print(y.decode('utf-8'))
     z = cipher.encrypt(y)

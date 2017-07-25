@@ -12,7 +12,7 @@ def decodeLines(filename):
 
 
 def splitAES(cipher):
-    k= 16
+    k = 16
     return [cipher[i:i+k] for i in range(0, len(cipher), k)]
 
 
@@ -26,8 +26,6 @@ if __name__ == "__main__":
     cipherTxt = decodeLines('cipherfile4')
     index = 0
     for line in cipherTxt:
-        index+=1
-        if isECB(line) == True:
-            print('Line:', index) 
-
-
+        index += 1
+        if isECB(line):
+            print('Line:', index)
