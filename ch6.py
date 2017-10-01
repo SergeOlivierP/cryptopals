@@ -1,5 +1,3 @@
-import string
-import binascii
 import base64
 import re
 import numpy as np
@@ -23,17 +21,17 @@ def splitCipher(keySize, cipher):
     l = len(cipher)
     splitted = [itemgetter(*range((0 + i) % keySize, l, keySize))(cipher)
                 for i in range(0, keySize)]
-    return splitted
+    return splitted[0]
 
 
 def xorSingleChar(bytestr, char):
-    return b''.join([ord(b) ^ ord(char) for b in bytestr])
+    return ''.join([ord(b) ^ ord(char) for b in bytestr])
 
 
 def getScore(b):
 
     s = str("".join([chr(j)
-            for j in bytestr if re.match(r"[a-zA-Z]|[ ]", chr(j))]))
+            for j in b if re.match(r"[a-zA-Z]|[ ]", chr(j))]))
 
     freqs = {
             'a': 0.0651738, 'b': 0.0124248, 'c': 0.0217339, 'd': 0.0349835,
@@ -55,6 +53,7 @@ def getScore(b):
 def findCeasarKey(cipher):
     printable = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012'\
     + '3456789:,. !?"
+
     plain = [getScore(xorSingleChar(cipher, char)) for char in printable]
     return printable[np.argmax(plain)]
 
@@ -69,7 +68,8 @@ def findKeySizes(cipher, n):
 
 def findKey(cipherText, KeySize):
     blocks = splitCipher(k, cipherTxt)
-    splitted = [[chr(j) for j in i] for i in blocks]
+    print(blocks)
+    splitted = [j.encode() for j in i for i in blocks]
     return "".join(findCeasarKey(splitted[l]) for l in range(0, k))
 
 
@@ -82,7 +82,8 @@ def deCipher(cipher, key):
 
 if __name__ == "__main__":
 
-    cipherTxt = base64.b64decode(open('cipherfile2', 'r').read())
+    with open('cipherfile2', 'r') as f:
+        cipherTxt = base64.b64decode(f.read())
 
     for guess in range(0, 5):
         k = findKeySizes(cipherTxt, guess)

@@ -1,6 +1,5 @@
 import base64
 from Crypto.Cipher import AES
-from Crypto.Util.strxor import strxor
 import util
 
 
@@ -54,7 +53,7 @@ if __name__ == '__main__':
     x = base64.b64decode(open('cipherfile5', 'r').read())
 
     key = b'YELLOW SUBMARINE'
-    cipher = CBC(key, bytes([0] * 16))
+    cipher = cbc(key, bytes([0] * 16))
     y = cipher.decrypt(x)
     print(y.decode('utf-8'))
     z = cipher.encrypt(y)
