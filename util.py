@@ -2,6 +2,7 @@ import binascii
 import base64
 import re
 import random
+import math
 
 # Operation of strings
 
@@ -11,7 +12,7 @@ def xor16(bytestrA, bytestrB):
 
 
 def xorSingleChar(bytestr, char):
-    return b''.join([ord(b) ^ ord(char) for b in bytestr])
+    return ''.join([chr(ord(b) ^ ord(char)) for b in bytestr])
 
 
 def padPKCS7(text):
@@ -77,9 +78,9 @@ def findKeySizes(cipher, n):
 
 
 def getScore(b):
-
-    s = str("".join([chr(j)
-            for j in bytestr if re.match(r"[a-zA-Z]|[ ]", chr(j))]))
+    entropy = 0
+    # s = str("".join([chr(j)
+    #         for j in b if re.match(r"[a-zA-Z]|[ ]", chr(j))]))
 
     freqs = {
              'a': 0.0651738, 'b': 0.0124248, 'c': 0.0217339, 'd': 0.0349835,
@@ -90,9 +91,10 @@ def getScore(b):
              'u': 0.0225134, 'v': 0.0082903, 'w': 0.0171272, 'x': 0.0013692,
              'y': 0.0145984, 'z': 0.0007836, ' ': 0.1918182
              }
-    score = 0
-    for i in s:
-        c = i.lower()
-        if c in freqs:
-            score += freqs[c]
-    return score
+
+    for i in b:
+        #c = i.lower()
+        if (re.match(r"[a-zA-Z]|[ ]", i) and (i.lower() in freqs)):
+            entropy -= freqs[i.lower()]*(math.log2(freqs[i.lower()]))
+        else: entropy += 1
+    return entropy

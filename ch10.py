@@ -58,6 +58,9 @@ if __name__ == "__main__":
     key = b'YELLOW SUBMARINE'
     plain = b'1 secret message2 secret message'
     IV = bytes(16)
-    x = base64.b64decode(open('cipherfile5', 'r').read())
+
+    with open('cipherfile5', 'r') as f:
+        c = f.read()
+    x = base64.b64decode(c)
 
     print(aesCBCDecrypt(key, x, IV))

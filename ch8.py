@@ -3,8 +3,11 @@ import binascii
 
 
 def decodeLines(filename):
-    f = open(filename, 'r')
-    for line in f:
+
+    with open(filename, 'r') as f:
+        c = f.read()
+
+    for line in c:
         if line[-1] == '\n':
             line = line[:-1]
         s = binascii.unhexlify(line)

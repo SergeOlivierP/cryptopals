@@ -27,13 +27,13 @@ def splitCipher(keySize, cipher):
 
 
 def xorSingleChar(bytestr, char):
-    return b''.join([ord(b) ^ ord(char) for b in bytestr])
+    return b''.join([bytes([ord(b) ^ ord(char)]) for b in bytestr])
 
 
 def getScore(b):
 
     s = str("".join([chr(j)
-            for j in bytestr if re.match(r"[a-zA-Z]|[ ]", chr(j))]))
+            for j in b if re.match(r"[a-zA-Z]|[ ]", chr(j))]))
 
     freqs = {
             'a': 0.0651738, 'b': 0.0124248, 'c': 0.0217339, 'd': 0.0349835,
@@ -82,7 +82,10 @@ def deCipher(cipher, key):
 
 if __name__ == "__main__":
 
-    cipherTxt = base64.b64decode(open('cipherfile2', 'r').read())
+    with open('cipherfile2', 'r') as f:
+        c = f.read()
+
+    cipherTxt = base64.b64decode(c)
 
     for guess in range(0, 5):
         k = findKeySizes(cipherTxt, guess)
