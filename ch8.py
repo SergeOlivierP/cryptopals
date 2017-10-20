@@ -31,4 +31,5 @@ if __name__ == "__main__":
     for line in cipherTxt:
         index += 1
         if isECB(line):
+            print(line)
             print('Line:', index)
