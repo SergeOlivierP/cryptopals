@@ -47,5 +47,4 @@ if __name__ == "__main__":
     toute = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     solution = findKey(cipher, toute)
     print("Key is: " + solution[1])
-    print()
-    print(solution[0])
+    print(xorSingleChar(cipher, solution[1]))
