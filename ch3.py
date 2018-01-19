@@ -1,21 +1,15 @@
-import string
 import re
+from functools import reduce
 
 
 def xorSingleChar(hexstr, char):
-
-    b1 = bytearray.fromhex(hexstr)
-    printable = []
-
-    for byte in b1:
-        sym = chr(byte ^ ord(char))
-        if re.match(r"[a-zA-Z]|[ ]", sym):
-            printable.append(sym)
-    result = str("".join([y for y in printable]))
-    return result
+    array = bytes.fromhex(hexstr)
+    reg = re.compile(r"[a-zA-Z]|[ ]")
+    printable = filter(reg.match, map(lambda x: chr(x ^ ord(char)), array))
+    return str("".join(printable))
 
 
-def getScore(s):
+def getScore(blob):
 
     freqs = {
         'a': 0.0651738, 'b': 0.0124248, 'c': 0.0217339, 'd': 0.0349835,
@@ -28,17 +22,17 @@ def getScore(s):
     }
 
     score = 0
-    for i in s:
-        c = i.lower()
-        if c in freqs:
-            score += freqs[c]
-    return score
+    for i in blob:
+        if i.lower() in freqs:
+            score += freqs[i.lower()]
+    return reduce()
 
 
 def findKey(cipher, symbols):
     plain = [getScore(xorSingleChar(cipher, char)) for char in toute]
     key = toute[plain.index(max(plain))]
     return((plain, key))
+
 
 if __name__ == "__main__":
 

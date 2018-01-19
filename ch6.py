@@ -1,41 +1,43 @@
 import base64
 import re
 import numpy as np
-from operator import itemgetter
 
 
-def hammingDist(text1, text2):
+def deCipher(cipher, key):
+    buf = str("".join([key for y in range(len(cipher))]))[:len(cipher)]
+    result = "".join([chr(cipher[i] ^ ord(buf[i]))
+                     for i in range(0, len(cipher))])
+    return(result)
+
+
+def hamming_dist(text1, text2):
     return sum([bin(text1[i] ^ text2[i]).count('1')
                for i in range(len(text1))])
 
 
 def getNorm(k, ciph):
-    d1 = hammingDist(ciph[:k], ciph[k:2*k])
-    d2 = hammingDist(ciph[2*k:3*k], ciph[3*k:4*k])
-    d3 = hammingDist(ciph[4*k:5*k], ciph[5*k:6*k])
-    d4 = hammingDist(ciph[6*k:7*k], ciph[7*k:8*k])
+    d1 = hamming_dist(ciph[:k], ciph[k:2*k])
+    d2 = hamming_dist(ciph[2*k:3*k], ciph[3*k:4*k])
+    d3 = hamming_dist(ciph[4*k:5*k], ciph[5*k:6*k])
+    d4 = hamming_dist(ciph[6*k:7*k], ciph[7*k:8*k])
     return (d1 + d2 + d3 + d4)/(4*k)
 
 
-def splitCipher(keySize, cipher):
-    l = len(cipher)
-    splitted = [itemgetter(*range((0 + i) % keySize, l, keySize))(cipher)
-                for i in range(0, keySize)]
-    return splitted[0]
+def findKeySizes(cipher, n):
+    tab = []
+    for i in range(2, 40):
+        tab.append((i, getNorm(i, cipher)))
+    tab.sort(key=lambda tup: tup[1])
+    return [tab[i][0] for i in range(n)]
 
 
 def xorSingleChar(bytestr, char):
-<<<<<<< HEAD
-    return b''.join([bytes([ord(b) ^ ord(char)]) for b in bytestr])
-=======
-    return ''.join([ord(b) ^ ord(char) for b in bytestr])
->>>>>>> f531117f44fda1d75e52fc4b2ab9d451dc870fb7
+    return ''.join([chr(b ^ ord(char)) for b in bytestr])
 
 
 def getScore(b):
 
-    s = str("".join([chr(j)
-            for j in b if re.match(r"[a-zA-Z]|[ ]", chr(j))]))
+    s = str("".join([j for j in b if re.match(r"[a-zA-Z]|[ ]", j)]))
 
     freqs = {
             'a': 0.0651738, 'b': 0.0124248, 'c': 0.0217339, 'd': 0.0349835,
@@ -62,26 +64,21 @@ def findCeasarKey(cipher):
     return printable[np.argmax(plain)]
 
 
-def findKeySizes(cipher, n):
-    tab = []
-    for i in range(2, 40):
-        tab.append((i, getNorm(i, cipher)))
-    tab.sort(key=lambda tup: tup[1])
-    return tab[n][0]
-
-
-def findKey(cipherText, KeySize):
+def findKey(cipherText, k):
     blocks = splitCipher(k, cipherTxt)
-    print(blocks)
-    splitted = [j.encode() for j in i for i in blocks]
-    return "".join(findCeasarKey(splitted[l]) for l in range(0, k))
+    splitted = [blob for blob in transpose(blocks)]
+    key = "".join(findCeasarKey(splitted[l]) for l in range(len(splitted)))
+    return key
 
 
-def deCipher(cipher, key):
-    buf = str("".join([key for y in range(len(cipher))]))[:len(cipher)]
-    result = "".join([chr(cipher[i] ^ ord(buf[i]))
-                     for i in range(0, len(cipher))])
-    return(result)
+def splitCipher(keySize, cipher):
+    l = len(cipher)
+    return [list(cipher[i:i+keySize]) for i in range(0, l, keySize)]
+
+
+def transpose(blocks):
+    for tup in list(zip(*blocks)):
+        yield list(tup)
 
 
 if __name__ == "__main__":
@@ -90,8 +87,8 @@ if __name__ == "__main__":
         c = f.read()
 
     cipherTxt = base64.b64decode(c)
+    print(type(cipherTxt))
 
-    for guess in range(0, 5):
-        k = findKeySizes(cipherTxt, guess)
-        print('Key size:', k)
-        print(findKey(cipherTxt, k), "\n")
+    for guess in findKeySizes(cipherTxt, 5):
+        print('Key size:', guess)
+        print(findKey(cipherTxt, guess), "\n")
