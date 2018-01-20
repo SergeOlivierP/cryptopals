@@ -1,5 +1,4 @@
 import re
-from functools import reduce
 
 
 def xorSingleChar(hexstr, char):
@@ -25,7 +24,7 @@ def getScore(blob):
     for i in blob:
         if i.lower() in freqs:
             score += freqs[i.lower()]
-    return reduce()
+    return score
 
 
 def findKey(cipher, symbols):

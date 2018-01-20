@@ -1,14 +1,12 @@
-import string
-import binascii
-
 
 def xorKey(txt, key):
-    buf = "".join([key for y in range(len(txt))])[:len(txt)]
-    xored = "".join([hex(ord(txt[i]) ^ ord(buf[i]))[2:] for i in range(0, len(txt))])
-    return xored
+    buf = b''.join([key for y in range(len(txt))][:len(txt)])
+    xored = bytes([txt[i] ^ buf[i] for i in range(len(txt))])
+    return xored.hex()
+
 
 if __name__ == "__main__":
-    plain = '''Burning 'em, if you ain't quick and nimble
-    I go crazy when I hear a cymbal'''
+    plain = ("Burning 'em, if you ain't quick and nimble\n"
+             "I go crazy when I hear a cymbal")
     key = 'ICE'
-    print(xorKey(plain, key))
+    print(xorKey(bytes(plain, 'utf-8'), bytes(key, 'utf-8')))
