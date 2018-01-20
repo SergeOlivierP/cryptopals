@@ -64,12 +64,12 @@ def findCeasarKey(cipher):
     return printable[np.argmax(plain)]
 
 
-def splitTxt(cipher_text, k):
-    blocks = splitCipher(k, cipher_text)
+def splitCipher(cipher_text, k):
+    blocks = splitTxt(k, cipher_text)
     return [blob for blob in transpose(blocks[:-1])]
 
 
-def splitCipher(keySize, cipher):
+def splitTxt(keySize, cipher):
     l = len(cipher)
     return [list(cipher[i:i+keySize]) for i in range(0, l, keySize)]
 
@@ -88,6 +88,6 @@ if __name__ == "__main__":
 
     for guess in key_lenghts:
         print('Key size:', guess)
-        splitted = splitTxt(cipher_txt, guess)
+        splitted = splitCipher(cipher_txt, guess)
         key = "".join(findCeasarKey(splitted[l]) for l in range(len(splitted)))
         print(key, "\n")
