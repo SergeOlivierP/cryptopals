@@ -3,15 +3,13 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 
 
-backend = default_backend()
 key = b'YELLOW SUBMARINE'
-x = base64.b64decode(open('cipherfile3', 'r').read())
+ciphertext = base64.b64decode(open('cipherfile3', 'r').read())
 
-plain = b'a secret message'
-cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=backend)
-decryptor = cipher.decryptor()
-encryptor = cipher.encryptor()
-cipherText = encryptor.update(plain) + encryptor.finalize()
-plain = decryptor.update(x) + decryptor.finalize()
+cipher = algorithms.AES(key)
+mode = modes.ECB()
 
-print(plain)
+decryptor = Cipher(cipher, mode, backend=default_backend()).decryptor()
+plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+
+print(plaintext)
