@@ -4,6 +4,9 @@ from functools import reduce
 import base64
 
 
+backend = default_backend()
+
+
 def xor(bytestr1, bytestr2):
     return [bytestr1[i] ^ bytestr2[i] for i in range(len(bytestr1))]
 
@@ -19,14 +22,12 @@ def splitTXT(text, keySize):
 
 
 def aesECBEncrypt(key, plain):
-    backend = default_backend()
     cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=backend)
     encryptor = cipher.encryptor()
     return encryptor.update(plain) + encryptor.finalize()
 
 
 def aesECBDecrypt(key, ciphertxt):
-    backend = default_backend()
     cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=backend)
     decryptor = cipher.decryptor()
     return decryptor.update(ciphertxt) + decryptor.finalize()
@@ -56,7 +57,6 @@ def aesCBCDecrypt(key, ciphertext, IV):
 if __name__ == "__main__":
 
     key = b'YELLOW SUBMARINE'
-    plain = b'1 secret message2 secret message'
     IV = bytes(16)
 
     with open('cipherfile5', 'r') as f:

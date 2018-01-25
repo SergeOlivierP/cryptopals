@@ -10,6 +10,6 @@ cipher = algorithms.AES(key)
 mode = modes.ECB()
 
 decryptor = Cipher(cipher, mode, backend=default_backend()).decryptor()
-plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+plaintext = decryptor.update(ciphertext)
 
 print(plaintext)

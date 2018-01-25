@@ -13,11 +13,11 @@ def encryptionOracle(text):
 
     if mode == 0:
         print("The oracle chose: CBC")
-        ecbCipher = aes.cbc(randBytes(16), randBytes(16))
+        ecbCipher = aes.cbc(key=randBytes(16), IV=randBytes(16))
         return ecbCipher.encrypt(toEncrypt)
     else:
         print("The oracle chose: ECB")
-        ecbCipher = aes.ecb(randBytes(16))
+        ecbCipher = aes.ecb(key=randBytes(16))
         return ecbCipher.encrypt(toEncrypt)
 
 
